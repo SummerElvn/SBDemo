@@ -1,0 +1,78 @@
+spring:
+  application:
+    name: microservice-a
+  config:
+    import: optional:configserver:http://localhost:8888/
+    name: different-config-properties
+  cloud:
+    config:
+      name: different-config-properties
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090/
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}  # Custom instance ID
+management:
+  security:
+    enabled: false
+  tracing:
+    enabled: true
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    base-url: http://localhost:9411
+  endpoints:
+      web:
+        exposure:
+          include: refresh,health,info,restart, shutdown,metrics, env, loggers, threaddump, caches
+      endpoint:
+        refresh:
+          enable: true
+      health:
+        show-details: always
+springdoc:
+  swagger-ui:
+    enabled: false
+
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  application:
+    name: devProfile
+props:
+  name: "Hemanadh"
+  age: 25
+  email: "hemanadh.v@gmail.com"
+
+---
+spring:
+  config:
+    activate:
+      on-profile:  uat
+  application:
+    name: uatProfile
+
+---
+spring:
+  config:
+    activate:
+      on-profile:  sit
+  application:
+    name: sitProfile
+---
+spring:
+  config:
+    activate:
+      on-profile:  prod
+  application:
+    name: prodProfile
