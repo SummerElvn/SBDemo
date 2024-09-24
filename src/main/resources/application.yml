@@ -153,9 +153,9 @@ spring:
   application:
     name: devProfile
 props:
-  name: "Hemanadh"
+  name: "Abc"
   age: 25
-  email: "hemanadh.v@gmail.com"
+  email: "abcv@gmail.com"
 
 ---
 spring:
