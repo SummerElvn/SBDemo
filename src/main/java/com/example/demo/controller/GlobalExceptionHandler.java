@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String,String>> runtimeExceptionHandler(RuntimeException ex){
-        log.error("Runtime Exception ", ex.getCause());
+        log.error("Runtime Exception ", ex);
         return new ResponseEntity<>(Map.of("Exception","Runtime Exception"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

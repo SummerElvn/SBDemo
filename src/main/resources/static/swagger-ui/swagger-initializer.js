@@ -14,7 +14,7 @@ window.onload = function() {
       SwaggerUIBundle.plugins.DownloadUrl
     ],
     layout: "StandaloneLayout",
-    supportedSubmitMethods: []
+    //supportedSubmitMethods: [] - to remove try it out button
   });
 
   //</editor-fold>

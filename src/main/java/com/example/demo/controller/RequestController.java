@@ -5,8 +5,8 @@ import com.example.demo.config.ConfigurationProperties;
 import com.example.demo.exception.MyException;
 import com.example.demo.model.Address;
 import com.example.demo.model.User;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.demo.service.IService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +17,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import org.apache.commons.configuration.beanutils.BeanHelper;
+import reactor.core.publisher.Mono;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/home")
@@ -44,13 +41,26 @@ public class RequestController {
 
     ConfigurationProperties props;
     ConfigServerProperties serverProps;
-    public RequestController(ConfigurationProperties props,ConfigServerProperties serverProps){
+
+    IService service;
+    public RequestController(ConfigurationProperties props,ConfigServerProperties serverProps,IService service){
         this.props = props;
         this.serverProps=serverProps;
+        this.service = service;
     }
 
     @Value("${spring.application.name:nothing}")
     public String profileName;
+
+
+    @GetMapping("/webclientexample")
+    public Mono<ResponseEntity<List<User>>> getUsersInformation(){
+        logger.info("Entering Controller");
+        Mono<ResponseEntity<List<User>>> response= service.getUserInfo().map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+        logger.info("Existing Controller");
+        return response;
+    }
 
     @GetMapping("/greeting")
     public String homeController(){
@@ -137,6 +147,7 @@ public class RequestController {
     return response.hasBody() ? response.getBody(): null;
 
     }
+
 
 
 }

@@ -11,12 +11,16 @@ spring:
     admin:
       client:
         url: http://localhost:9090/
+  security:
+    user:
+      password: 123
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
   instance:
     instance-id: ${spring.application.name}  # Custom instance ID
+
 management:
   security:
     enabled: false
@@ -30,7 +34,7 @@ management:
   endpoints:
       web:
         exposure:
-          include: refresh,health,info,restart, shutdown,metrics, env, loggers, threaddump, caches
+          include: refresh,health,info,restart, shutdown,metrics, env, loggers, threaddump, caches, circuitbreakers
       endpoint:
         refresh:
           enable: true
@@ -40,6 +44,105 @@ springdoc:
   swagger-ui:
     enabled: false
 
+resilience4j.circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true # Tells Resilience4j to register a health indicator for the Circuit Breaker with Spring Boot Actuator.
+        failureRateThreshold: 50 # Failure rate percentage - If you make 20 calls and 1 of them fails, the Circuit Breaker will open because 1/20 = 5%.
+        waitDurationInOpenState: 5s # How long the Circuit Breaker should remain in the OPEN state before transitioning to the HALF_OPEN state
+        permittedNumberOfCallsInHalfOpenState: 3 # Number of test calls allowed while the Circuit Breaker is in the HALF_OPEN state
+        slidingWindowSize: 5 # The failure rate is calculated over last 5 calls
+        minimumNumberOfCalls: 10 # Minimum number of calls that must be made before the Circuit Breaker starts calculating the failure rate
+    instances:
+      getUsersCircuitBreaker:
+        baseConfig: default
+      addNewUserCircuitBreaker:
+        baseConfig: default
+      getUserCircuitBreaker:
+        baseConfig: default
+      modifyUserCircuitBreaker:
+        baseConfig: default
+      circuitBreakerCheck:
+        baseConfig: default
+      getUserInfoBreaker:
+        baseConfig: default
+
+resilience4j.retry:
+  configs:
+    default:
+      maxAttempts: 3
+      waitDuration: 100
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+        - java.util.concurrent.TimeoutException
+        - java.io.IOException
+
+  instances:
+    getUsersRetry:
+      baseConfig: default
+    addUserRetry:
+      baseConfig: default
+    getUserRetry:
+      baseConfig: default
+    modifyUserRetry:
+      baseConfig: default
+
+resilience4j.bulkhead:
+  configs:
+    default:
+      maxConcurrentCalls: 100
+  instances:
+    getUsersBulkHead:
+      maxConcurrentCalls: 10
+    addUserBulkHead:
+      maxWaitDuration: 10ms
+      maxConcurrentCalls: 20
+    getUserBulkHead:
+      maxConcurrentCalls: 10
+    modifyUserBulkHead:
+      maxWaitDuration: 10ms
+      maxConcurrentCalls: 20
+
+resilience4j.ratelimiter:
+  configs:
+    default:
+      registerHealthIndicator: false
+      limitForPeriod: 10
+      limitRefreshPeriod: 1s
+      timeoutDuration: 0
+      eventConsumerBufferSize: 100
+  instances:
+    getUsersRateLimiter:
+      baseConfig: default
+    addUserRateLimiter:
+      limitForPeriod: 6
+      limitRefreshPeriod: 500ms
+      timeoutDuration: 3s
+    getUserRateLimiter:
+      baseConfig: default
+    modifyUserRateLimiter:
+      limitForPeriod: 6
+      limitRefreshPeriod: 500ms
+      timeoutDuration: 3s
+
+resilience4j.timelimiter:
+  configs:
+    default:
+      cancelRunningFuture: false
+      timeoutDuration: 6s
+  instances:
+    getUsersTimeLimiter:
+      baseConfig: default
+    addUserTimeLimiter:
+      baseConfig: default
+    getUserTimeLimiter:
+      baseConfig: default
+    modifyUserTimeLimiter:
+      baseConfig: default
+
+logging:
+  level:
+    io.github.resilience4j.circuitbreaker: DEBUG
 
 
 ---
