@@ -3,7 +3,6 @@ package com.example.demo.service;
 import com.example.demo.config.ConfigServerProperties;
 import com.example.demo.model.Address;
 import com.example.demo.model.User;
-import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -21,7 +20,7 @@ import java.util.List;
 @Service
 public class ExternalServiceImplementation {
 
-    Logger log = LoggerFactory.getLogger(ServiceImplementation.class);
+    Logger log = LoggerFactory.getLogger(ServiceImplementationFlux.class);
     private final WebClient webClient;
     private final ConfigServerProperties configServerProperties;
     public ExternalServiceImplementation(WebClient webClient,ConfigServerProperties configServerProperties){
@@ -31,7 +30,7 @@ public class ExternalServiceImplementation {
 
     @CircuitBreaker(name = "getUsersCircuitBreaker", fallbackMethod = "getUsersFallback")
     @Retry(name = "getUsersRetry", fallbackMethod = "getUsersFallback")
-    @Bulkhead(name = "getUsersBulkHead", type = Bulkhead.Type.SEMAPHORE)
+   // @Bulkhead(name = "getUsersBulkHead", type = Bulkhead.Type.SEMAPHORE)
     @RateLimiter(name = "getUsersRateLimiter", fallbackMethod = "getUsersFallback")
     @TimeLimiter(name = "getUsersTimeLimiter", fallbackMethod = "getUsersFallback")
     public Mono<List<User>> getUsers() {
@@ -44,7 +43,7 @@ public class ExternalServiceImplementation {
 
     @CircuitBreaker(name = "addUserCircuitBreaker", fallbackMethod = "addUserFallback")
     @Retry(name = "addUserRetry", fallbackMethod = "addUserFallback")
-    @Bulkhead(name = "addUserBulkHead", type = Bulkhead.Type.SEMAPHORE)
+  //  @Bulkhead(name = "addUserBulkHead", type = Bulkhead.Type.SEMAPHORE)
     @RateLimiter(name = "addUserRateLimiter", fallbackMethod = "addUserFallback")
     @TimeLimiter(name = "addUserTimeLimiter", fallbackMethod = "addUserFallback")
     public Mono<List<User>> addNewUser() {
@@ -57,7 +56,7 @@ public class ExternalServiceImplementation {
 
     @CircuitBreaker(name = "getUserCircuitBreaker", fallbackMethod = "getUserFallback")
     @Retry(name = "getUserRetry", fallbackMethod = "getUserFallback")
-    @Bulkhead(name = "getUserBulkHead", type = Bulkhead.Type.SEMAPHORE)
+   // @Bulkhead(name = "getUserBulkHead", type = Bulkhead.Type.SEMAPHORE)
     @RateLimiter(name = "getUserRateLimiter", fallbackMethod = "getUserFallback")
     @TimeLimiter(name = "getUserTimeLimiter", fallbackMethod = "getUserFallback")
     public Mono<User> getUser() {
@@ -69,7 +68,7 @@ public class ExternalServiceImplementation {
 
     @CircuitBreaker(name = "modifyUserCircuitBreaker", fallbackMethod = "modifyUserFallback")
     @Retry(name = "modifyUserRetry", fallbackMethod = "modifyUserFallback")
-    @Bulkhead(name = "modifyUserBulkHead", type = Bulkhead.Type.SEMAPHORE)
+  //  @Bulkhead(name = "modifyUserBulkHead", type = Bulkhead.Type.SEMAPHORE)
     @RateLimiter(name = "modifyUserRateLimiter", fallbackMethod = "modifyUserFallback")
     @TimeLimiter(name = "modifyUserTimeLimiter", fallbackMethod = "modifyUserFallback")
     public Mono<User> modifyUser() {

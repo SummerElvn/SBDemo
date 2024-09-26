@@ -5,7 +5,10 @@ import com.example.demo.config.ConfigurationProperties;
 import com.example.demo.exception.MyException;
 import com.example.demo.model.Address;
 import com.example.demo.model.User;
+import com.example.demo.model.dbentities.Book;
 import com.example.demo.service.IService;
+import com.example.demo.service.ServiceImplementation;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -19,8 +22,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/home")
@@ -42,16 +49,27 @@ public class RequestController {
     ConfigurationProperties props;
     ConfigServerProperties serverProps;
 
+    ServiceImplementation serviceImplementation;
+
     IService service;
-    public RequestController(ConfigurationProperties props,ConfigServerProperties serverProps,IService service){
+    public RequestController(ConfigurationProperties props,ConfigServerProperties serverProps,IService service,
+                             ServiceImplementation serviceImplementation){
         this.props = props;
         this.serverProps=serverProps;
         this.service = service;
+        this.serviceImplementation = serviceImplementation;
     }
 
     @Value("${spring.application.name:nothing}")
     public String profileName;
 
+    @GetMapping("/dbexample")
+    public ResponseEntity<List<Book>> getBookInfo(){
+        logger.info("Entering get Book Info controller");
+        List<Book> list=serviceImplementation.getBookInformation();
+        logger.info("Exiting get Book Info controller {}",list);
+        return ResponseEntity.ok(list);
+    }
 
     @GetMapping("/webclientexample")
     public Mono<ResponseEntity<List<User>>> getUsersInformation(){
@@ -68,15 +86,9 @@ public class RequestController {
     }
 
     @GetMapping("/properties")
-    public String getConfigServerProps() throws IllegalAccessException {
+    public String getConfigServerProps()  {
         return serverProps.toString();
-
     }
-
-  /*  @RequestMapping("/greetingR")
-    public String homeControllerRequestMapping(){
-        return "Hello, This is my First Controller After a Long Time"+serverProps.toString();
-    }*/
 
     @RequestMapping(value = "/NewHome",method = RequestMethod.GET)
     public String home(){

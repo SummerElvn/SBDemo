@@ -14,6 +14,25 @@ spring:
   security:
     user:
       password: 123
+  datasource:
+    url: jdbc:mysql://localhost:3306/user_management  # jdbc:oracle:thin:@localhost:1521:user_management
+                                                      # jdbc:postgresql://localhost:5432/user_management
+                                                      # jdbc:sqlserver://localhost:1433;databaseName=user_management
+                                                      # jdbc:sqlite:/path_to_db/user_management.db
+                                                      # jdbc:h2:mem:user_management
+    username: root
+    password: root
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect #MySQLDialect,PostgreSQLDialect,OracleDialect,SQLServerDialect
+    hibernate:
+      ddl-auto: update  # none - no attempt to modify the database schema
+                        # validate - validate that the database schema matches the entity mappings without making changes
+                        # update   - will attempt to update the database schema to match the entity mappings. It modifies the schema if necessary but does not drop existing tables or data
+                        # create   -  will create the database schema on startup, dropping any existing schema and data
+                        # create-drop - Same as create, but the schema will be dropped when the application shuts down.
+
 eureka:
   client:
     serviceUrl:
@@ -42,7 +61,7 @@ management:
         show-details: always
 springdoc:
   swagger-ui:
-    enabled: false
+    enabled: false # disabling the spring doc provided swagger ui and the use custom swagger ui code, which kept in resources/static/swagger-ui folder to disable try it out
 
 resilience4j.circuitbreaker:
     configs:
@@ -107,23 +126,19 @@ resilience4j.ratelimiter:
   configs:
     default:
       registerHealthIndicator: false
-      limitForPeriod: 10
+      limitForPeriod: 1000
       limitRefreshPeriod: 1s
-      timeoutDuration: 0
+      timeoutDuration: 10
       eventConsumerBufferSize: 100
   instances:
     getUsersRateLimiter:
       baseConfig: default
     addUserRateLimiter:
-      limitForPeriod: 6
-      limitRefreshPeriod: 500ms
-      timeoutDuration: 3s
+      baseConfig: default
     getUserRateLimiter:
       baseConfig: default
     modifyUserRateLimiter:
-      limitForPeriod: 6
-      limitRefreshPeriod: 500ms
-      timeoutDuration: 3s
+      baseConfig: default
 
 resilience4j.timelimiter:
   configs:

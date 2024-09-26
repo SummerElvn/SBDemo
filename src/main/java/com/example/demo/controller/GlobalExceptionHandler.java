@@ -24,12 +24,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MyException.class)
     public ResponseEntity<Map<String,String>> myCustomException(MyException ex){
         log.error("Exception Occured",ex);
-        return new ResponseEntity<>(Map.of("Exception",ex.getMessage()), HttpStatus.GONE);
+        return new ResponseEntity<>(Map.of("Exception",ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String,String>> univeralException(Exception ex){
         log.error("Exception Occured",ex);
-        return new ResponseEntity<>(Map.of("Exception",ex.getMessage()), HttpStatus.GONE);
+        return new ResponseEntity<>(Map.of("Exception",ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
